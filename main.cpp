@@ -1,9 +1,7 @@
 #include <iostream>
 #include <vector>
-#include <algorithm>
 using namespace std;
-
-//-----Estructura-----//
+//-----Estructuras-----//
 struct TFunciones {
     string nom_funcion;
     vector<string> parametros;
@@ -24,7 +22,6 @@ struct TTareas {
 vector<THabitaciones> habitaciones;
 vector<TDispositivos> dispositivos;
 vector<TTareas> tareas;
-
 //-----Funciones de la estructura-----//
 void crear_habitacion(string Phabi){
     THabitaciones habi;
@@ -56,8 +53,7 @@ void add_dispositivo(string Phabi ,string Pdisp ,string Pid){
                     habitacion.dispositivos.push_back(dispositivo);
                     break;
                 }
-            }
-            break;
+            }break;
         }
     }
 }
@@ -88,14 +84,11 @@ void crear_specs(string Ptarea, string Phabi , string Pdisp ,string Pid, string 
                                 if(tarea.nom_tarea==Ptarea){
                                     tarea.specs.push_back(specs);
                                 }
-                            }
-                            break;
+                            }break;
                         }
-                    }
-                    break;
+                    }break;
                 }
-            }
-            break;
+            }break;
         }
     }
 }
