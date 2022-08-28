@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 using namespace std;
 
 //-----Estructura-----//
@@ -44,18 +45,15 @@ void crear_func(string Pfunc ,string Pdisp ,vector<string> Pparam) {
             dispositivo.funciones.push_back(func);
             break;
         }
-        else {
-            cout << "Dispositivo no encontrado.";
-        }
     }
 }
 void add_dispositivo(string Phabi ,string Pdisp ,string Pid){
-    for (auto & habitacione : habitaciones) {
-        if (habitacione.nom_habitacion==Phabi) {
+    for (auto & habitacion : habitaciones) {
+        if (habitacion.nom_habitacion==Phabi) {
             for (auto & dispositivo : dispositivos){
                 if (dispositivo.nom_dispositivo == Pdisp) {
                     dispositivo.id_dispositivo=Pid;
-                    habitacione.dispositivos.push_back(dispositivo);
+                    habitacion.dispositivos.push_back(dispositivo);
                     break;
                 }
             }
@@ -64,20 +62,25 @@ void add_dispositivo(string Phabi ,string Pdisp ,string Pid){
     }
 }
 //-----Creacion de tareas-----//
+void crear_tarea(string Ptarea){
+    TTareas tarea;
+    tarea.nom_tarea=Ptarea;
+    tareas.push_back(tarea);
+}
 void crear_specs(string Ptarea, string Phabi , string Pdisp ,string Pid, string Pfunc){
     vector <string>specs;
     string params;
-    for (auto & habitacione : habitaciones) {
-        if (habitacione.nom_habitacion==Phabi) {
+    for (auto & habitacion : habitaciones) {
+        if (habitacion.nom_habitacion==Phabi) {
             specs.push_back(Phabi);
-            for (auto & dispositivo : habitacione.dispositivos){
+            for (auto & dispositivo : habitacion.dispositivos){
                 if (dispositivo.nom_dispositivo == Pdisp && dispositivo.id_dispositivo== Pid) {
                     specs.push_back(Pdisp);
-                    for (auto & funcione : dispositivo.funciones){
-                        if (funcione.nom_funcion == Pfunc) {
+                    for (auto & funcion : dispositivo.funciones){
+                        if (funcion.nom_funcion == Pfunc) {
                             specs.push_back(Pfunc);
-                            for(auto & parametro : funcione.parametros){
-                                cout<< "Digite el parámetro de "<<parametro<<endl;
+                            for(auto & parametro : funcion.parametros){
+                                cout<< "Digite el parametro de "<<parametro<<" de la funcion "<<funcion.nom_funcion<<" del dispositivo "<< dispositivo.nom_dispositivo<<" de ID "<<dispositivo.id_dispositivo<<" de la habitacion " << habitacion.nom_habitacion<<endl;
                                 cin>> params;
                                 specs.push_back(params);
                             }
@@ -98,5 +101,42 @@ void crear_specs(string Ptarea, string Phabi , string Pdisp ,string Pid, string 
 }
 
 int main() {
-    cout<<"hola pp";
+    crear_habitacion("cuarto");
+    crear_habitacion("cocina");
+    crear_habitacion("comedor");
+
+    crear_disp("bombillo");
+    crear_disp("enchufe");
+    crear_disp("coffe maker");
+
+    crear_func("encender","bombillo",vector<string>{"brillo","color"});
+    crear_func("encender","enchufe",vector<string>{"amperaje","voltaje"});
+    crear_func("encender","coffe maker",vector<string>{"tipo","temperatura","cantidad"});
+
+    add_dispositivo("cuarto","bombillo","1");
+    add_dispositivo("cuarto","bombillo","2");
+    add_dispositivo("cuarto","enchufe","1");
+    add_dispositivo("cocina","bombillo","1");
+    add_dispositivo("cocina","coffe maker","1");
+    add_dispositivo("comedor","bombillo","1");
+    add_dispositivo("comedor","bombillo","2");
+
+    crear_tarea("buenos dias");
+    crear_specs("buenos dias","cuarto","bombillo","1","encender");
+    crear_specs("buenos dias","cuarto","bombillo","2","encender");
+    crear_specs("buenos dias","cuarto","enchufe","1","encender");
+    crear_specs("buenos dias","cocina","bombillo","1","encender");
+    crear_specs("buenos dias","cocina","coffe maker","1","encender");
+    crear_specs("buenos dias","comedor","bombillo","1","encender");
+    crear_specs("buenos dias","comedor","bombillo","2","encender");
+
+    for(auto & tarea : tareas){
+        cout<<tarea.nom_tarea<<endl;
+        for(auto & spec : tarea.specs){
+            for(auto & str : spec){
+                cout<<str<<" ";
+            }
+            cout<<endl<<"despues"<<endl;
+        }
+    }
 }
