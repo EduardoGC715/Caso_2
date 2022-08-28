@@ -1,56 +1,58 @@
 #include <iostream>
-#include <vector>
+#include "List.h"
+
 using namespace std;
 //-----Estructuras-----//
 struct TFunciones {
     string nom_funcion;
-    vector<string> parametros;
+    List<string> *parametros = new List<string>();
 };
 struct TDispositivos {
     string nom_dispositivo;
     string id_dispositivo;
-    vector<TFunciones> funciones;
+    List<TFunciones> *funciones = new List<TFunciones>();
 };
 struct THabitaciones {
     string nom_habitacion;
-    vector<TDispositivos> dispositivos;
+    List<TDispositivos> *dispositivos = new List<TDispositivos>();
 };
 struct TTareas {
     string nom_tarea;
-    vector<vector<string>> specs;
+    List<List<string>> *specs = new List<List<string>>();
 };
-vector<THabitaciones> habitaciones;
-vector<TDispositivos> dispositivos;
-vector<TTareas> tareas;
+auto *habitaciones = new List<THabitaciones>();
+auto *dispositivos = new List<TDispositivos>();
+auto *tareas = new List<TTareas>();
+
 //-----Funciones de la estructura-----//
 void crear_habitacion(string Phabi){
-    THabitaciones habi;
-    habi.nom_habitacion=Phabi;
-    habitaciones.push_back(habi);
+    auto *habi= new THabitaciones();
+    habi->nom_habitacion=Phabi;
+    habitaciones->add(habi);
 }
 void crear_disp(string Pdisp){
-    TDispositivos disp;
-    disp.nom_dispositivo=Pdisp;
-    dispositivos.push_back(disp);
+    auto *disp = new TDispositivos();
+    disp->nom_dispositivo=Pdisp;
+    dispositivos->add(disp);
 }
-void crear_func(string Pfunc ,string Pdisp ,vector<string> Pparam) {
-    for (auto & dispositivo : dispositivos) {
-        if (dispositivo.nom_dispositivo == Pdisp) {
-            TFunciones func;
-            func.nom_funcion = Pfunc;
-            func.parametros = Pparam;
-            dispositivo.funciones.push_back(func);
+void crear_func(string Pfunc , string Pdisp , basic_string<char> *Pparam) {
+    for (int disp=0; disp<dispositivos->getSize(); disp++) {
+        if (dispositivos->find(disp)->nom_dispositivo == Pdisp) {
+            auto *func = new TFunciones();
+            func->nom_funcion = Pfunc;
+            func->parametros->add(Pparam);
+            dispositivos->find(disp)->funciones->add(func);
             break;
         }
     }
 }
 void add_dispositivo(string Phabi ,string Pdisp ,string Pid){
-    for (auto & habitacion : habitaciones) {
-        if (habitacion.nom_habitacion==Phabi) {
-            for (auto & dispositivo : dispositivos){
-                if (dispositivo.nom_dispositivo == Pdisp) {
-                    dispositivo.id_dispositivo=Pid;
-                    habitacion.dispositivos.push_back(dispositivo);
+    for (int habi=0; habi<habitaciones->getSize(); habi++) {
+        if (habitaciones->find(habi)->nom_habitacion==Phabi) {
+            for (int disp=0; disp<dispositivos->getSize(); disp++){
+                if (dispositivos->find(disp)->nom_dispositivo == Pdisp) {
+                    dispositivos->find(disp)->id_dispositivo=Pid;
+                    habitaciones->find(habi)->dispositivos->add(dispositivos->find(disp));
                     break;
                 }
             }break;
@@ -59,30 +61,33 @@ void add_dispositivo(string Phabi ,string Pdisp ,string Pid){
 }
 //-----Creacion de tareas-----//
 void crear_tarea(string Ptarea){
-    TTareas tarea;
-    tarea.nom_tarea=Ptarea;
-    tareas.push_back(tarea);
+    auto *tarea = new TTareas();
+    tarea->nom_tarea=Ptarea;
+    tareas->add(tarea);
 }
-void crear_specs(string Ptarea, string Phabi , string Pdisp ,string Pid, string Pfunc){
-    vector <string>specs;
+void crear_specs(string Ptarea, string Phabi , string Pdisp , string Pid, string Pfunc){
+    auto *specs = new List<string>();
     string params;
-    for (auto & habitacion : habitaciones) {
-        if (habitacion.nom_habitacion==Phabi) {
-            specs.push_back(Phabi);
-            for (auto & dispositivo : habitacion.dispositivos){
-                if (dispositivo.nom_dispositivo == Pdisp && dispositivo.id_dispositivo== Pid) {
-                    specs.push_back(Pdisp);
-                    for (auto & funcion : dispositivo.funciones){
-                        if (funcion.nom_funcion == Pfunc) {
-                            specs.push_back(Pfunc);
-                            for(auto & parametro : funcion.parametros){
-                                cout<< "Digite el parametro de "<<parametro<<" de la funcion "<<funcion.nom_funcion<<" del dispositivo "<< dispositivo.nom_dispositivo<<" de ID "<<dispositivo.id_dispositivo<<" de la habitacion " << habitacion.nom_habitacion<<endl;
+    for (int habi=0; habi<habitaciones->getSize(); habi++) {
+        if (habitaciones->find(habi)->nom_habitacion==Phabi) {
+            specs->add(new string(Phabi));
+            for (int disp=0; disp<habitaciones->find(habi)->dispositivos->getSize(); disp++){
+                if (habitaciones->find(habi)->dispositivos->find(disp)->nom_dispositivo == Pdisp && habitaciones->find(habi)->dispositivos->find(disp)->id_dispositivo== Pid) {
+                    specs->add(new string(Pdisp));
+                    for (int func=0; func<habitaciones->find(habi)->dispositivos->find(disp)->funciones->getSize(); func++){
+                        if (habitaciones->find(habi)->dispositivos->find(disp)->funciones->find(func)->nom_funcion == Pfunc) {
+                            specs->add(new string(Pfunc));
+                            for(int param =0; param<habitaciones->find(habi)->dispositivos->find(disp)->funciones->find(func)->parametros->getSize(); param++){
+
+                                cout<< "Digite el parametro de ";
+                                printf("%s", (string *)habitaciones->find(habi)->dispositivos->find(disp)->funciones->find(func)->parametros->find(param));
+                                cout<<" de la funcion "<<habitaciones->find(habi)->dispositivos->find(disp)->funciones->find(func)->nom_funcion<<" del dispositivo "<< habitaciones->find(habi)->dispositivos->find(disp)->nom_dispositivo<<" de ID "<<habitaciones->find(habi)->dispositivos->find(disp)->id_dispositivo<<" de la habitacion " << habitaciones->find(habi)->nom_habitacion<<endl;
                                 cin>> params;
-                                specs.push_back(params);
+                                specs->add(new string(params));
                             }
-                            for (auto & tarea : tareas){
-                                if(tarea.nom_tarea==Ptarea){
-                                    tarea.specs.push_back(specs);
+                            for (int tarea=0; tarea<tareas->getSize();tarea++){
+                                if(tareas->find(tarea)->nom_tarea==Ptarea){
+                                    tareas->find(tarea)->specs->add(specs);
                                 }
                             }break;
                         }
@@ -94,6 +99,7 @@ void crear_specs(string Ptarea, string Phabi , string Pdisp ,string Pid, string 
 }
 
 int main() {
+
     crear_habitacion("cuarto");
     crear_habitacion("cocina");
     crear_habitacion("comedor");
@@ -102,9 +108,23 @@ int main() {
     crear_disp("enchufe");
     crear_disp("coffe maker");
 
-    crear_func("encender","bombillo",vector<string>{"brillo","color"});
-    crear_func("encender","enchufe",vector<string>{"amperaje","voltaje"});
-    crear_func("encender","coffe maker",vector<string>{"tipo","temperatura","cantidad"});
+    auto *uno = new List<string>();
+    uno->add((basic_string<char> *) "brillo");
+    uno->add((basic_string<char> *) "color");
+
+    auto *dos = new List<string>();
+    dos->add((basic_string<char> *) "amperaje");
+    dos->add((basic_string<char> *) "voltaje");
+
+    auto *tres = new List<string>();
+    tres->add((basic_string<char> *) ("tipo"));
+    tres->add((basic_string<char> *) "temperatura");
+    tres->add((basic_string<char> *) "cantidad");
+
+
+    crear_func("encender", "bombillo", reinterpret_cast<basic_string<char> *>(uno));
+    crear_func("encender", "enchufe", reinterpret_cast<basic_string<char> *>(dos));
+    crear_func("encender", "coffe maker", reinterpret_cast<basic_string<char> *>(tres));
 
     add_dispositivo("cuarto","bombillo","1");
     add_dispositivo("cuarto","bombillo","2");
@@ -123,11 +143,12 @@ int main() {
     crear_specs("buenos dias","comedor","bombillo","1","encender");
     crear_specs("buenos dias","comedor","bombillo","2","encender");
 
-    for(auto & tarea : tareas){
-        cout<<tarea.nom_tarea<<endl;
-        for(auto & spec : tarea.specs){
-            for(auto & str : spec){
-                cout<<str<<" ";
+    for(int tarea=0; tarea<tareas->getSize();tarea++ ){
+        cout<<tareas->find(tarea)->nom_tarea<<endl;
+        for(int spec = 0; spec<tareas->find(tarea)->specs->getSize(); spec++){
+            for(int str=0; str<tareas->find(tarea)->specs->find(spec)->getSize();str++){
+                printf("%s",tareas->find(tarea)->specs->find(spec)->find(str));
+                cout<<" ";
             }
             cout<<endl<<"despues"<<endl;
         }
